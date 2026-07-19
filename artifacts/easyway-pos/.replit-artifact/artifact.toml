@@ -1,0 +1,27 @@
+kind = "web"
+previewPath = "/"
+title = "EasyWay POS"
+version = "1.0.0"
+id = "artifacts/easyway-pos"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 24478
+
+[services.development]
+run = "pnpm --filter @workspace/easyway-pos run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/easyway-pos", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/easyway-pos/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "24478"
+BASE_PATH = "/"

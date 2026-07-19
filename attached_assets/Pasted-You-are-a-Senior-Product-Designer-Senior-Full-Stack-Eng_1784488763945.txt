@@ -1,0 +1,554 @@
+You are a Senior Product Designer, Senior Full Stack Engineer, and UX Expert.
+
+Your task is to build a PREMIUM, MODERN, MOBILE-FIRST Progressive Web App (PWA) called
+
+# EasyWay POS
+### Tea Shop Billing System
+
+This should NOT look like a college project.
+It should look like a premium SaaS product similar to Stripe, Square POS, Shopify POS, Toast POS, or Clover.
+
+====================================================
+
+GOAL
+
+Create the fastest billing experience possible for small tea shops, bakeries, juice shops and snack shops.
+
+A shop owner should be able to create a bill in under 10 seconds.
+
+Everything must be optimized for mobile first.
+
+====================================================
+
+TECH STACK
+
+Frontend
+- React
+- TypeScript
+- Vite
+- TailwindCSS
+- shadcn/ui
+- Framer Motion
+- Lucide Icons
+
+Backend
+- Express
+- Node.js
+
+Database
+- SQLite
+
+PWA
+- Installable
+- Offline Support
+- Service Worker
+- Manifest
+- Add To Home Screen
+- Responsive
+
+====================================================
+
+DESIGN STYLE
+
+Modern
+
+Minimal
+
+Elegant
+
+Premium
+
+Rounded cards
+
+Soft shadows
+
+Glassmorphism
+
+Smooth animations
+
+Beautiful gradients
+
+Large touch targets
+
+Professional spacing
+
+No ugly buttons
+
+No bootstrap
+
+No material UI
+
+Everything custom.
+
+====================================================
+
+COLOR PALETTE
+
+Primary
+#0F766E
+
+Secondary
+#14B8A6
+
+Accent
+#F59E0B
+
+Background
+#F8FAFC
+
+Text
+#111827
+
+Cards
+White
+
+Dark Mode
+Fully supported
+
+====================================================
+
+TYPOGRAPHY
+
+Font
+
+Poppins
+
+Font weights
+
+500
+600
+700
+
+====================================================
+
+ANIMATIONS
+
+Framer Motion
+
+Animate
+
+Cards
+
+Buttons
+
+Page transitions
+
+Bottom sheets
+
+Dialogs
+
+Bill success
+
+Charts
+
+Micro interactions
+
+Everything should feel alive.
+
+====================================================
+
+LOGIN SCREEN
+
+Beautiful illustration
+
+Logo
+
+Shop Name
+
+PIN Login
+
+Remember Login
+
+Dark Mode
+
+====================================================
+
+HOME
+
+Display
+
+Today's Sales
+
+Today's Orders
+
+Best Selling Item
+
+Current Time
+
+Quick Actions
+
+Recent Bills
+
+Beautiful cards
+
+====================================================
+
+BOTTOM NAVIGATION
+
+🏠 Home
+
+🧾 Billing
+
+📦 Products
+
+📊 Reports
+
+⚙ Settings
+
+====================================================
+
+BILLING SCREEN
+
+This is the heart of the app.
+
+Large searchable product grid.
+
+Products shown as beautiful cards.
+
+Each tap instantly adds item.
+
+Each tap should have a satisfying animation.
+
+Current bill appears at bottom.
+
+Increase quantity
+
+Decrease quantity
+
+Swipe to remove
+
+Discount
+
+Notes
+
+Payment Type
+
+Cash
+
+UPI
+
+Card
+
+Split Payment
+
+Complete Bill button
+
+After completion
+
+Beautiful success animation
+
+Confetti
+
+Sound effect support
+
+Auto start New Bill
+
+====================================================
+
+PRODUCT CARD
+
+Image
+
+Product Name
+
+Price
+
+Favorite Icon
+
+Long press opens Edit
+
+====================================================
+
+PRODUCTS PAGE
+
+Search
+
+Categories
+
+Add Product
+
+Edit Product
+
+Delete Product
+
+Product Image
+
+Price
+
+Stock
+
+Favorite
+
+====================================================
+
+ADD PRODUCT
+
+Product Name
+
+Price
+
+Category
+
+Image Upload
+
+Stock
+
+Barcode (optional)
+
+Save
+
+====================================================
+
+REPORTS
+
+Today
+
+Weekly
+
+Monthly
+
+Custom
+
+Charts
+
+Revenue
+
+Profit
+
+Best Selling Items
+
+Payment Method Split
+
+Average Bill
+
+Peak Hours
+
+====================================================
+
+SALES HISTORY
+
+Beautiful timeline
+
+Search bills
+
+Filter
+
+Print Again
+
+Share Bill
+
+Delete Bill
+
+====================================================
+
+SETTINGS
+
+Shop Details
+
+Logo Upload
+
+GST
+
+Currency
+
+Receipt Design
+
+Printer
+
+Backup
+
+Restore
+
+Dark Mode
+
+About
+
+====================================================
+
+RECEIPT
+
+Beautiful thermal receipt
+
+Shop Logo
+
+QR
+
+Bill Number
+
+Items
+
+Taxes
+
+Total
+
+Payment Type
+
+Footer
+
+Printable
+
+====================================================
+
+PWA FEATURES
+
+Works offline
+
+Instant loading
+
+Offline database
+
+Auto sync later
+
+Install prompt
+
+Native feel
+
+Splash Screen
+
+Home Screen Icon
+
+====================================================
+
+PERFORMANCE
+
+Lighthouse Score
+
+95+
+
+Accessibility
+
+95+
+
+SEO
+
+100
+
+Performance
+
+100
+
+====================================================
+
+UX RULES
+
+One thumb operation.
+
+Large buttons.
+
+Minimum tap distance.
+
+Maximum readability.
+
+No clutter.
+
+Everything should be obvious.
+
+No unnecessary dialogs.
+
+No unnecessary confirmations.
+
+====================================================
+
+MICRO INTERACTIONS
+
+Ripple effect
+
+Hover
+
+Tap feedback
+
+Page transition
+
+Loading skeleton
+
+Success checkmark animation
+
+Floating Action Button animation
+
+====================================================
+
+BONUS FEATURES
+
+Voice Billing
+
+Example
+
+User says
+
+"2 Tea, 1 Coffee"
+
+Items automatically added.
+
+Barcode Scanner
+
+QR Scanner
+
+Customer Notes
+
+Favorite Products
+
+Most Sold Products
+
+Quick Bill Templates
+
+Repeat Last Bill
+
+====================================================
+
+CODE QUALITY
+
+Component based architecture
+
+Reusable components
+
+Hooks
+
+Context API
+
+Clean folder structure
+
+Professional naming
+
+Production ready
+
+====================================================
+
+CREATE THESE PAGES
+
+Login
+
+Home
+
+Billing
+
+Products
+
+Add Product
+
+Edit Product
+
+Sales History
+
+Reports
+
+Settings
+
+Receipt Preview
+
+404
+
+====================================================
+
+IMPORTANT
+
+Do not generate a basic CRUD app.
+
+Create an award-winning mobile-first POS experience.
+
+The UI should feel like an app people would happily pay for.
+
+Every page should include beautiful empty states, loading states, smooth animations, and polished transitions.
+
+Use realistic sample data and high-quality placeholder product images (tea, coffee, snacks).
+
+The final output should be fully responsive, installable as a PWA, and visually stunning with attention to every detail.
