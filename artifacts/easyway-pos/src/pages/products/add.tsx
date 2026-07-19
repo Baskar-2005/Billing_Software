@@ -63,7 +63,7 @@ export default function AddProduct() {
         setLocation("/products");
       },
       onError: (err) => {
-        toast.error("Failed to create product: " + (err?.error || "Unknown error"));
+        toast.error("Failed to create product: " + ((err as any)?.error || "Unknown error"));
       }
     });
   }

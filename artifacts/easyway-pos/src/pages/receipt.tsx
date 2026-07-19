@@ -14,7 +14,7 @@ export default function ReceiptView() {
   const [, setLocation] = useLocation();
 
   const { data: bill, isLoading: loadingBill } = useGetBill(id, {
-    query: { enabled: !!id }
+    query: { queryKey: ["/api/bills", id], enabled: !!id }
   });
   
   const { data: settings, isLoading: loadingSettings } = useGetSettings();
@@ -187,22 +187,13 @@ export default function ReceiptView() {
         </div>
       </div>
       
-      <style dangerouslySetInline>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @media print {
-          body * {
-            visibility: hidden;
-          }
-          .receipt-cut, .receipt-cut * {
-            visibility: visible;
-          }
-          .receipt-cut {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100%;
-          }
+          body * { visibility: hidden; }
+          .receipt-cut, .receipt-cut * { visibility: visible; }
+          .receipt-cut { position: absolute; left: 0; top: 0; width: 100%; }
         }
-      `}</style>
+      ` }} />
     </AppLayout>
   );
 }

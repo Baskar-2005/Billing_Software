@@ -95,7 +95,7 @@ export default function EditProduct() {
         setLocation("/products");
       },
       onError: (err) => {
-        toast.error("Failed to update product: " + (err?.error || "Unknown error"));
+        toast.error("Failed to update product: " + ((err as any)?.error || "Unknown error"));
       }
     });
   }

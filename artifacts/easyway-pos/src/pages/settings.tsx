@@ -88,7 +88,7 @@ export default function Settings() {
         queryClient.invalidateQueries({ queryKey: getGetSettingsQueryKey() });
       },
       onError: (err) => {
-        toast.error("Failed to save settings: " + (err?.error || "Unknown error"));
+        toast.error("Failed to save settings: " + ((err as any)?.error || "Unknown error"));
       }
     });
   };
