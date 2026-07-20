@@ -1,6 +1,7 @@
 import { Router, type IRouter } from "express";
 import multer from "multer";
 import { createClient } from "@supabase/supabase-js";
+import WebSocket from "ws";
 
 const router: IRouter = Router();
 
@@ -23,7 +24,13 @@ function getSupabase() {
   if (!url || !key) {
     throw new Error("SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY must be set");
   }
-  return createClient(url, key);
+  // Provide ws as the WebSocket transport so Node.js 20 doesn't throw a
+  // "native WebSocket not found" error (only needed for realtime; storage
+  // uses HTTP but the client initialises the realtime module eagerly).
+  return createClient(url, key, {
+    realtime: { transport: WebSocket as unknown as typeof globalThis.WebSocket },
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
 }
 
 // POST /api/upload/product-image
