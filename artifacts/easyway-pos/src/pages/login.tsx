@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
-import { useLogin, useGetAuthStatus } from "@workspace/api-client-react";
+import { useQueryClient } from "@tanstack/react-query";
+import { useLogin, useGetAuthStatus, getGetAuthStatusQueryKey } from "@workspace/api-client-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Coffee, Moon, Sun, Loader2, Delete } from "lucide-react";
 import { toast } from "sonner";
@@ -12,6 +13,7 @@ export default function Login() {
   const [pin, setPin] = useState("");
   const [, setLocation] = useLocation();
   const { theme, setTheme } = useTheme();
+  const queryClient = useQueryClient();
   
   const { data: auth, isLoading: authLoading } = useGetAuthStatus();
   const login = useLogin();
@@ -38,6 +40,9 @@ export default function Login() {
         onSuccess: (res) => {
           if (res.authenticated) {
             toast.success("Welcome back!");
+            // Immediately update the cached auth status so AuthGuard
+            // sees authenticated=true before the navigation resolves.
+            queryClient.setQueryData(getGetAuthStatusQueryKey(), res);
             setLocation("/");
           } else {
             toast.error("Invalid PIN");
