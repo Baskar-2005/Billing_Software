@@ -39,6 +39,13 @@ router.post("/auth/login", async (req, res): Promise<void> => {
   }
 
   (req as any).session.authenticated = true;
+
+  // Explicitly save before responding — in serverless the async DB write must
+  // complete before the client makes the next request or the session won't exist.
+  await new Promise<void>((resolve, reject) => {
+    (req as any).session.save((err: unknown) => (err ? reject(err) : resolve()));
+  });
+
   res.json({ authenticated: true, shopName: settings.shopName });
 });
 
