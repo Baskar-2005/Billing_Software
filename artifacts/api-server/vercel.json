@@ -3,6 +3,7 @@
   "installCommand": "npm install -g pnpm@10 && cd ../.. && pnpm install --no-frozen-lockfile",
   "buildCommand": "cd ../.. && pnpm --filter @workspace/api-server run build",
   "framework": null,
+  "outputDirectory": "public",
   "functions": {
     "api/index.mjs": {
       "maxDuration": 30
