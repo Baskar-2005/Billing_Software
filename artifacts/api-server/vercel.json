@@ -3,6 +3,7 @@
   "installCommand": "npm install -g pnpm@10 && cd ../.. && pnpm install --no-frozen-lockfile",
   "buildCommand": "cd ../.. && pnpm run typecheck:libs",
   "framework": null,
+  "outputDirectory": ".",
   "functions": {
     "api/index.ts": {
       "memory": 1024,
