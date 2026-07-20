@@ -360,7 +360,13 @@ export async function customFetch<T = unknown>(
 
   const requestInfo = { method, url: resolveUrl(input) };
 
-  const response = await fetch(input, { ...init, method, headers });
+  // When a baseUrl is configured the request is cross-origin (different Vercel
+  // domain). We need credentials:"include" so the browser sends the session
+  // cookie. Falls back to whatever the caller passed in `init.credentials`.
+  const credentials: RequestCredentials =
+    init.credentials ?? (_baseUrl ? "include" : "same-origin");
+
+  const response = await fetch(input, { ...init, method, headers, credentials });
 
   if (!response.ok) {
     const errorData = await parseErrorBody(response, method);
