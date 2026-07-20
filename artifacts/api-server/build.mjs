@@ -3,7 +3,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { build as esbuild } from "esbuild";
 import esbuildPluginPino from "esbuild-plugin-pino";
-import { rm } from "node:fs/promises";
+import { rm, copyFile } from "node:fs/promises";
 
 // Plugins (e.g. 'esbuild-plugin-pino') may use `require` to resolve dependencies
 globalThis.require = createRequire(import.meta.url);
@@ -118,6 +118,14 @@ globalThis.__dirname = __bannerPath.dirname(globalThis.__filename);
     `,
     },
   });
+
+  // connect-pg-simple reads table.sql at runtime to create the session table.
+  // esbuild doesn't copy non-JS assets, so we do it manually here.
+  const tableSqlSrc = path.resolve(
+    artifactDir,
+    "../../node_modules/.pnpm/connect-pg-simple@10.0.0/node_modules/connect-pg-simple/table.sql"
+  );
+  await copyFile(tableSqlSrc, path.join(distDir, "table.sql"));
 }
 
 buildAll().catch((err) => {

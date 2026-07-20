@@ -1,0 +1,2 @@
+- [Session store table.sql](session-store-table-sql.md) — connect-pg-simple needs table.sql copied to dist; esbuild won't bundle it automatically.
+- [EasyWay POS default PIN](easyway-pos-pin.md) — login UI requires 6 digits; default PIN is 123456.
