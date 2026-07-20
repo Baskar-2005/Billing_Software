@@ -1,0 +1,960 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: EasyWay POS API specification
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: auth
+    description: Authentication
+  - name: categories
+    description: Product categories
+  - name: products
+    description: Product management
+  - name: bills
+    description: Billing and orders
+  - name: reports
+    description: Sales reports and analytics
+  - name: settings
+    description: Shop settings
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      description: Returns server health status
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+
+  /auth/login:
+    post:
+      operationId: login
+      tags: [auth]
+      summary: PIN login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginInput"
+      responses:
+        "200":
+          description: Logged in
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResult"
+        "401":
+          description: Invalid PIN
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/logout:
+    post:
+      operationId: logout
+      tags: [auth]
+      summary: Logout
+      responses:
+        "200":
+          description: Logged out
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /auth/status:
+    get:
+      operationId: getAuthStatus
+      tags: [auth]
+      summary: Get current auth status
+      responses:
+        "200":
+          description: Auth status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResult"
+
+  /categories:
+    get:
+      operationId: listCategories
+      tags: [categories]
+      summary: List all categories
+      responses:
+        "200":
+          description: List of categories
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Category"
+    post:
+      operationId: createCategory
+      tags: [categories]
+      summary: Create a category
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CategoryInput"
+      responses:
+        "201":
+          description: Created category
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Category"
+
+  /categories/{id}:
+    put:
+      operationId: updateCategory
+      tags: [categories]
+      summary: Update a category
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CategoryInput"
+      responses:
+        "200":
+          description: Updated category
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Category"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      operationId: deleteCategory
+      tags: [categories]
+      summary: Delete a category
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /products:
+    get:
+      operationId: listProducts
+      tags: [products]
+      summary: List all products
+      parameters:
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: categoryId
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: favorites
+          in: query
+          required: false
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: List of products
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Product"
+    post:
+      operationId: createProduct
+      tags: [products]
+      summary: Create a product
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProductInput"
+      responses:
+        "201":
+          description: Created product
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+
+  /products/{id}:
+    get:
+      operationId: getProduct
+      tags: [products]
+      summary: Get a product by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Product
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    put:
+      operationId: updateProduct
+      tags: [products]
+      summary: Update a product
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProductUpdate"
+      responses:
+        "200":
+          description: Updated product
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      operationId: deleteProduct
+      tags: [products]
+      summary: Delete a product
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /products/{id}/favorite:
+    patch:
+      operationId: toggleFavorite
+      tags: [products]
+      summary: Toggle product favorite status
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Updated product
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+
+  /bills:
+    get:
+      operationId: listBills
+      tags: [bills]
+      summary: List bills with optional filters
+      parameters:
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: paymentMethod
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: startDate
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: endDate
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of bills
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Bill"
+    post:
+      operationId: createBill
+      tags: [bills]
+      summary: Create a new bill
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BillInput"
+      responses:
+        "201":
+          description: Created bill
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Bill"
+
+  /bills/{id}:
+    get:
+      operationId: getBill
+      tags: [bills]
+      summary: Get a bill by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Bill
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Bill"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      operationId: deleteBill
+      tags: [bills]
+      summary: Delete a bill
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /reports/summary:
+    get:
+      operationId: getReportSummary
+      tags: [reports]
+      summary: Get sales summary (today, weekly, monthly, custom)
+      parameters:
+        - name: period
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [today, week, month, custom]
+        - name: startDate
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: endDate
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Report summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReportSummary"
+
+  /reports/top-products:
+    get:
+      operationId: getTopProducts
+      tags: [reports]
+      summary: Get top selling products
+      parameters:
+        - name: period
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [today, week, month, custom]
+        - name: startDate
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: endDate
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Top products
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TopProduct"
+
+  /reports/payment-methods:
+    get:
+      operationId: getPaymentMethodStats
+      tags: [reports]
+      summary: Get payment method breakdown
+      parameters:
+        - name: period
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [today, week, month, custom]
+        - name: startDate
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: endDate
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Payment method stats
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PaymentMethodStat"
+
+  /reports/peak-hours:
+    get:
+      operationId: getPeakHours
+      tags: [reports]
+      summary: Get peak hours data
+      parameters:
+        - name: period
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [today, week, month, custom]
+        - name: startDate
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: endDate
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Peak hours data
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PeakHourStat"
+
+  /reports/revenue-trend:
+    get:
+      operationId: getRevenueTrend
+      tags: [reports]
+      summary: Get daily revenue trend
+      parameters:
+        - name: period
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [week, month, custom]
+        - name: startDate
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: endDate
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Revenue trend data
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RevenueTrendPoint"
+
+  /settings:
+    get:
+      operationId: getSettings
+      tags: [settings]
+      summary: Get shop settings
+      responses:
+        "200":
+          description: Settings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Settings"
+    put:
+      operationId: updateSettings
+      tags: [settings]
+      summary: Update shop settings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SettingsUpdate"
+      responses:
+        "200":
+          description: Updated settings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Settings"
+
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+
+    ErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
+
+    SuccessResponse:
+      type: object
+      required: [success]
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+
+    LoginInput:
+      type: object
+      required: [pin]
+      properties:
+        pin:
+          type: string
+          minLength: 4
+          maxLength: 6
+
+    AuthResult:
+      type: object
+      required: [authenticated]
+      properties:
+        authenticated:
+          type: boolean
+        shopName:
+          type: ["string", "null"]
+
+    Category:
+      type: object
+      required: [id, name, color, createdAt]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        color:
+          type: string
+        icon:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+
+    CategoryInput:
+      type: object
+      required: [name, color]
+      properties:
+        name:
+          type: string
+          minLength: 1
+        color:
+          type: string
+        icon:
+          type: string
+
+    Product:
+      type: object
+      required: [id, name, price, isFavorite, stock, createdAt]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        price:
+          type: number
+        categoryId:
+          type: ["integer", "null"]
+        categoryName:
+          type: ["string", "null"]
+        image:
+          type: ["string", "null"]
+        isFavorite:
+          type: boolean
+        stock:
+          type: ["integer", "null"]
+        barcode:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+
+    ProductInput:
+      type: object
+      required: [name, price]
+      properties:
+        name:
+          type: string
+          minLength: 1
+        price:
+          type: number
+          minimum: 0
+        categoryId:
+          type: ["integer", "null"]
+        image:
+          type: ["string", "null"]
+        stock:
+          type: ["integer", "null"]
+        barcode:
+          type: ["string", "null"]
+
+    ProductUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+        price:
+          type: number
+          minimum: 0
+        categoryId:
+          type: ["integer", "null"]
+        image:
+          type: ["string", "null"]
+        stock:
+          type: ["integer", "null"]
+        barcode:
+          type: ["string", "null"]
+
+    BillItem:
+      type: object
+      required: [productId, productName, quantity, unitPrice, totalPrice]
+      properties:
+        productId:
+          type: integer
+        productName:
+          type: string
+        quantity:
+          type: integer
+        unitPrice:
+          type: number
+        totalPrice:
+          type: number
+
+    BillItemInput:
+      type: object
+      required: [productId, productName, quantity, unitPrice]
+      properties:
+        productId:
+          type: integer
+        productName:
+          type: string
+        quantity:
+          type: integer
+          minimum: 1
+        unitPrice:
+          type: number
+
+    Bill:
+      type: object
+      required: [id, billNumber, items, subtotal, discount, tax, total, paymentMethod, createdAt]
+      properties:
+        id:
+          type: integer
+        billNumber:
+          type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/BillItem"
+        subtotal:
+          type: number
+        discount:
+          type: number
+        tax:
+          type: number
+        total:
+          type: number
+        paymentMethod:
+          type: string
+          enum: [cash, upi, card, split]
+        cashAmount:
+          type: ["number", "null"]
+        upiAmount:
+          type: ["number", "null"]
+        cardAmount:
+          type: ["number", "null"]
+        notes:
+          type: ["string", "null"]
+        customerName:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+
+    BillInput:
+      type: object
+      required: [items, paymentMethod]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/BillItemInput"
+          minItems: 1
+        discount:
+          type: number
+          minimum: 0
+        notes:
+          type: ["string", "null"]
+        customerName:
+          type: ["string", "null"]
+        paymentMethod:
+          type: string
+          enum: [cash, upi, card, split]
+        cashAmount:
+          type: ["number", "null"]
+        upiAmount:
+          type: ["number", "null"]
+        cardAmount:
+          type: ["number", "null"]
+
+    ReportSummary:
+      type: object
+      required: [totalRevenue, totalOrders, averageBill, totalDiscount, totalTax]
+      properties:
+        totalRevenue:
+          type: number
+        totalOrders:
+          type: integer
+        averageBill:
+          type: number
+        totalDiscount:
+          type: number
+        totalTax:
+          type: number
+        bestSellingItem:
+          type: ["string", "null"]
+        revenueGrowth:
+          type: ["number", "null"]
+        ordersGrowth:
+          type: ["number", "null"]
+
+    TopProduct:
+      type: object
+      required: [productId, productName, quantitySold, revenue]
+      properties:
+        productId:
+          type: integer
+        productName:
+          type: string
+        quantitySold:
+          type: integer
+        revenue:
+          type: number
+        image:
+          type: ["string", "null"]
+
+    PaymentMethodStat:
+      type: object
+      required: [method, count, amount, percentage]
+      properties:
+        method:
+          type: string
+        count:
+          type: integer
+        amount:
+          type: number
+        percentage:
+          type: number
+
+    PeakHourStat:
+      type: object
+      required: [hour, orders, revenue]
+      properties:
+        hour:
+          type: integer
+        orders:
+          type: integer
+        revenue:
+          type: number
+
+    RevenueTrendPoint:
+      type: object
+      required: [date, revenue, orders]
+      properties:
+        date:
+          type: string
+        revenue:
+          type: number
+        orders:
+          type: integer
+
+    Settings:
+      type: object
+      required: [shopName, currency, taxRate, taxEnabled, pin]
+      properties:
+        shopName:
+          type: string
+        shopAddress:
+          type: ["string", "null"]
+        shopPhone:
+          type: ["string", "null"]
+        shopLogo:
+          type: ["string", "null"]
+        currency:
+          type: string
+        currencySymbol:
+          type: string
+        taxRate:
+          type: number
+        taxEnabled:
+          type: boolean
+        gstNumber:
+          type: ["string", "null"]
+        receiptFooter:
+          type: ["string", "null"]
+        pin:
+          type: string
+        darkMode:
+          type: boolean
+        soundEnabled:
+          type: boolean
+
+    SettingsUpdate:
+      type: object
+      properties:
+        shopName:
+          type: string
+        shopAddress:
+          type: ["string", "null"]
+        shopPhone:
+          type: ["string", "null"]
+        shopLogo:
+          type: ["string", "null"]
+        currency:
+          type: string
+        currencySymbol:
+          type: string
+        taxRate:
+          type: number
+        taxEnabled:
+          type: boolean
+        gstNumber:
+          type: ["string", "null"]
+        receiptFooter:
+          type: ["string", "null"]
+        pin:
+          type: string
+        darkMode:
+          type: boolean
+        soundEnabled:
+          type: boolean
