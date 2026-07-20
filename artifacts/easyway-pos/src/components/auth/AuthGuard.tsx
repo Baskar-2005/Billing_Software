@@ -12,7 +12,12 @@ export function AuthGuard({ children }: AuthGuardProps) {
   const { data: auth, isLoading } = useGetAuthStatus({ 
     query: {
       queryKey: getGetAuthStatusQueryKey(),
-      retry: false
+      retry: false,
+      // Keep a fresh login result valid for 60 s so the background refetch that
+      // fires on component mount doesn't immediately discard what the login
+      // handler just wrote into the cache.  This prevents the "flash to
+      // dashboard then back to login" race on slow cross-domain round-trips.
+      staleTime: 60_000,
     }
   });
 

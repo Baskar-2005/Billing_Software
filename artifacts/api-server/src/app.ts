@@ -10,6 +10,10 @@ import { logger } from "./lib/logger";
 const app: Application = express();
 const isProd = process.env.NODE_ENV === "production";
 
+// Trust the first proxy (required on Vercel / any reverse-proxy host) so that
+// req.secure reflects the original HTTPS connection, not the internal HTTP hop.
+app.set("trust proxy", 1);
+
 app.use(
   pinoHttp({
     logger,
@@ -48,10 +52,14 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: isProd,          // HTTPS-only in production
+      // Cross-domain setup (FRONTEND_URL set) always needs SameSite=None + Secure
+      // so the browser sends the cookie on cross-origin requests from the frontend.
+      // We key off FRONTEND_URL rather than NODE_ENV because Vercel may not
+      // automatically inject NODE_ENV=production into the serverless runtime.
+      secure: !!process.env.FRONTEND_URL || isProd,
       httpOnly: true,
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-      sameSite: isProd ? "none" : "lax", // "none" required for cross-site cookies on Vercel
+      sameSite: (process.env.FRONTEND_URL || isProd) ? "none" : "lax",
     },
   }),
 );
