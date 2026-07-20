@@ -4,12 +4,12 @@
   "buildCommand": "cd ../.. && pnpm run typecheck:libs",
   "framework": null,
   "functions": {
-    "src/vercel.ts": {
+    "api/index.ts": {
       "memory": 1024,
       "maxDuration": 30
     }
   },
   "rewrites": [
-    { "source": "/(.*)", "destination": "/src/vercel.ts" }
+    { "source": "/(.*)", "destination": "/api/index.ts" }
   ]
 }
