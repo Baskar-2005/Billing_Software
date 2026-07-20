@@ -25,7 +25,10 @@ app.use(
 );
 
 // CORS — in production restrict to the deployed frontend URL
-const allowedOrigin = process.env.FRONTEND_URL ?? true;
+// Strip any trailing slash — browsers send origins without one, so a mismatch causes CORS failure
+const allowedOrigin = process.env.FRONTEND_URL
+  ? process.env.FRONTEND_URL.replace(/\/+$/, "")
+  : true;
 app.use(cors({ origin: allowedOrigin, credentials: true }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
