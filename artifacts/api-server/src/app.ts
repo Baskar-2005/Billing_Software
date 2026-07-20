@@ -1,4 +1,4 @@
-import express, { type Express } from "express";
+import express, { type Application } from "express";
 import cors from "cors";
 import pinoHttp from "pino-http";
 import session from "express-session";
@@ -7,7 +7,7 @@ import { pool } from "@workspace/db";
 import router from "./routes";
 import { logger } from "./lib/logger";
 
-const app: Express = express();
+const app: Application = express();
 const isProd = process.env.NODE_ENV === "production";
 
 app.use(

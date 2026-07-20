@@ -7,7 +7,6 @@
     "strict": true,
     "skipLibCheck": true,
     "noEmit": false,
-    "types": ["node"],
     "customConditions": ["workspace"]
   },
   "include": ["."],
