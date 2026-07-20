@@ -1,4 +1,4 @@
-const CACHE_NAME = 'easyway-pos-v1';
+const CACHE_NAME = 'easyway-pos-v2';
 const URLS_TO_CACHE = [
   '/',
   '/index.html',
@@ -14,6 +14,9 @@ self.addEventListener('install', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
+  // Never intercept API requests — let them go straight to the network
+  if (event.request.url.includes('/api/')) return;
+
   event.respondWith(
     caches.match(event.request).then((response) => {
       return response || fetch(event.request);
