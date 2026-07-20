@@ -10,7 +10,13 @@ if (!process.env.DATABASE_URL) {
   );
 }
 
-export const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+// SSL is required for Supabase pooler connections (e.g. on Vercel/production).
+// rejectUnauthorized: false is safe here — Supabase uses self-signed certs on the pooler.
+const ssl = process.env.DATABASE_URL?.includes("supabase")
+  ? { rejectUnauthorized: false }
+  : undefined;
+
+export const pool = new Pool({ connectionString: process.env.DATABASE_URL, ssl });
 export const db = drizzle(pool, { schema });
 
 export * from "./schema";
