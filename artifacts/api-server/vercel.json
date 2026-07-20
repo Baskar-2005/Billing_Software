@@ -3,16 +3,13 @@
   "installCommand": "npm install -g pnpm@10 && cd ../.. && pnpm install --no-frozen-lockfile",
   "buildCommand": "cd ../.. && pnpm run typecheck:libs",
   "framework": null,
-  "builds": [
-    {
-      "src": "src/vercel.ts",
-      "use": "@vercel/node",
-      "config": {
-        "maxLambdaSize": "50mb"
-      }
+  "functions": {
+    "src/vercel.ts": {
+      "memory": 1024,
+      "maxDuration": 30
     }
-  ],
-  "routes": [
-    { "src": "/(.*)", "dest": "/src/vercel.ts" }
+  },
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/src/vercel.ts" }
   ]
 }
