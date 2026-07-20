@@ -21,6 +21,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { ImageUpload } from "@/components/ui/image-upload";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
@@ -174,9 +175,13 @@ export default function EditProduct() {
               name="image"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Image URL (Optional)</FormLabel>
+                  <FormLabel>Product Image (Optional)</FormLabel>
                   <FormControl>
-                    <Input placeholder="https://..." className="bg-background rounded-xl" {...field} />
+                    <ImageUpload
+                      value={field.value ?? ""}
+                      onChange={field.onChange}
+                      disabled={updateProduct.isPending}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

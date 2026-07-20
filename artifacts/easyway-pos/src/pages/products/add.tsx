@@ -132,9 +132,13 @@ export default function AddProduct() {
               name="image"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Image URL (Optional)</FormLabel>
+                  <FormLabel>Product Image (Optional)</FormLabel>
                   <FormControl>
-                    <Input placeholder="https://..." className="bg-background rounded-xl" {...field} />
+                    <ImageUpload
+                      value={field.value ?? ""}
+                      onChange={field.onChange}
+                      disabled={createProduct.isPending}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
