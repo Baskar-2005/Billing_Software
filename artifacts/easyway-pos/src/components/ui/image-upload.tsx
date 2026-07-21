@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { ImageIcon, Upload, X, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -12,6 +12,11 @@ export function ImageUpload({ value, onChange, disabled }: ImageUploadProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [preview, setPreview] = useState<string>(value);
+
+  // Sync preview when the parent updates the value (e.g. settings loads after mount)
+  useEffect(() => {
+    setPreview(value);
+  }, [value]);
 
   const handleFile = async (file: File) => {
     // Show a local blob preview immediately so the user gets instant feedback
