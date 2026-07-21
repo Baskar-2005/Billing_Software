@@ -2,8 +2,9 @@ import { AppLayout } from "@/components/layout/AppLayout";
 import { TopBar } from "@/components/layout/TopBar";
 import { useGetSettings, useUpdateSettings, getGetSettingsQueryKey } from "@workspace/api-client-react";
 import { useState, useEffect } from "react";
-import { Store, Receipt, Calculator, KeyRound, Save, Loader2, Image as ImageIcon } from "lucide-react";
+import { Store, Receipt, Calculator, KeyRound, Save, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { ImageUpload } from "@/components/ui/image-upload";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -135,8 +136,11 @@ export default function Settings() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="shopLogo" className="flex items-center gap-2">Logo URL <ImageIcon className="w-3 h-3 text-muted-foreground" /></Label>
-              <Input id="shopLogo" name="shopLogo" placeholder="https://..." value={formData.shopLogo} onChange={handleChange} className="rounded-xl" />
+              <Label className="flex items-center gap-2">Shop Logo</Label>
+              <ImageUpload
+                value={formData.shopLogo}
+                onChange={(url) => setFormData(prev => ({ ...prev, shopLogo: url }))}
+              />
             </div>
           </div>
         </motion.div>
