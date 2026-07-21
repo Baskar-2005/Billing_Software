@@ -36348,10 +36348,10 @@ var init_subquery = __esm({
     init_entity();
     Subquery = class {
       static [entityKind] = "Subquery";
-      constructor(sql3, fields, alias, isWith = false, usedTables = []) {
+      constructor(sql2, fields, alias, isWith = false, usedTables = []) {
         this._ = {
           brand: "Subquery",
-          sql: sql3,
+          sql: sql2,
           selectedFields: fields,
           alias,
           isWith,
@@ -36806,19 +36806,19 @@ var init_sql = __esm({
         return new SQL([this]);
       }
     };
-    ((sql22) => {
+    ((sql2) => {
       function empty() {
         return new SQL([]);
       }
-      sql22.empty = empty;
+      sql2.empty = empty;
       function fromList(list) {
         return new SQL(list);
       }
-      sql22.fromList = fromList;
+      sql2.fromList = fromList;
       function raw(str) {
         return new SQL([new StringChunk(str)]);
       }
-      sql22.raw = raw;
+      sql2.raw = raw;
       function join(chunks, separator) {
         const result = [];
         for (const [i, chunk] of chunks.entries()) {
@@ -36829,24 +36829,24 @@ var init_sql = __esm({
         }
         return new SQL(result);
       }
-      sql22.join = join;
+      sql2.join = join;
       function identifier(value) {
         return new Name(value);
       }
-      sql22.identifier = identifier;
+      sql2.identifier = identifier;
       function placeholder2(name2) {
         return new Placeholder(name2);
       }
-      sql22.placeholder = placeholder2;
+      sql2.placeholder = placeholder2;
       function param2(value, encoder) {
         return new Param(value, encoder);
       }
-      sql22.param = param2;
+      sql2.param = param2;
     })(sql || (sql = {}));
     ((SQL2) => {
       class Aliased {
-        constructor(sql22, fieldAlias) {
-          this.sql = sql22;
+        constructor(sql2, fieldAlias) {
+          this.sql = sql2;
           this.fieldAlias = fieldAlias;
         }
         static [entityKind] = "SQL.Aliased";
@@ -40202,8 +40202,8 @@ var init_dialect = __esm({
           return "none";
         }
       }
-      sqlToQuery(sql22, invokeSource) {
-        return sql22.toQuery({
+      sqlToQuery(sql2, invokeSource) {
+        return sql2.toQuery({
           casing: this.casing,
           escapeName: this.escapeName,
           escapeParam: this.escapeParam,
@@ -42945,10 +42945,10 @@ var init_raw = __esm({
     init_entity();
     init_query_promise();
     PgRaw = class extends QueryPromise {
-      constructor(execute, sql3, query, mapBatchResult) {
+      constructor(execute, sql2, query, mapBatchResult) {
         super();
         this.execute = execute;
-        this.sql = sql3;
+        this.sql = sql2;
         this.query = query;
         this.mapBatchResult = mapBatchResult;
       }
@@ -43268,8 +43268,8 @@ var init_db = __esm({
 });
 
 // ../../node_modules/.pnpm/drizzle-orm@0.45.2_@types+pg@8.20.0_pg@8.22.0/node_modules/drizzle-orm/cache/core/cache.js
-async function hashQuery(sql3, params) {
-  const dataToHash = `${sql3}-${JSON.stringify(params)}`;
+async function hashQuery(sql2, params) {
+  const dataToHash = `${sql2}-${JSON.stringify(params)}`;
   const encoder = new TextEncoder();
   const data = encoder.encode(dataToHash);
   const hashBuffer = await crypto.subtle.digest("SHA-256", data);
@@ -43540,8 +43540,8 @@ var init_session = __esm({
         ).all();
       }
       /** @internal */
-      async count(sql22, token) {
-        const res = await this.execute(sql22, token);
+      async count(sql2, token) {
+        const res = await this.execute(sql2, token);
         return Number(
           res[0]["count"]
         );
@@ -43817,8 +43817,8 @@ var init_session2 = __esm({
           if (isPool) session2.client.release();
         }
       }
-      async count(sql22) {
-        const res = await this.execute(sql22);
+      async count(sql2) {
+        const res = await this.execute(sql2);
         return Number(
           res["rows"][0]["count"]
         );
@@ -94370,35 +94370,57 @@ var import_express6 = __toESM(require_express2(), 1);
 init_src();
 init_drizzle_orm();
 var router6 = (0, import_express6.Router)();
+var IST_OFFSET_MS = (5 * 60 + 30) * 60 * 1e3;
+function toIST(utcDate) {
+  return new Date(utcDate.getTime() + IST_OFFSET_MS);
+}
+function istDateKey(utcDate) {
+  const d = toIST(utcDate);
+  const y = d.getUTCFullYear();
+  const m = String(d.getUTCMonth() + 1).padStart(2, "0");
+  const dd = String(d.getUTCDate()).padStart(2, "0");
+  return `${y}-${m}-${dd}`;
+}
+function istHour(utcDate) {
+  return toIST(utcDate).getUTCHours();
+}
+function istDayBounds(y, m, d) {
+  return {
+    start: new Date(Date.UTC(y, m, d, 0, 0, 0, 0) - IST_OFFSET_MS),
+    end: new Date(Date.UTC(y, m, d, 23, 59, 59, 999) - IST_OFFSET_MS)
+  };
+}
+function istTodayBounds() {
+  const ist = toIST(/* @__PURE__ */ new Date());
+  return istDayBounds(ist.getUTCFullYear(), ist.getUTCMonth(), ist.getUTCDate());
+}
 function getDateRange(period, startDate, endDate) {
-  const now = /* @__PURE__ */ new Date();
-  const end = /* @__PURE__ */ new Date();
-  end.setHours(23, 59, 59, 999);
   if (startDate && endDate) {
-    const s = new Date(startDate);
-    const e = new Date(endDate);
-    e.setHours(23, 59, 59, 999);
-    return { start: s, end: e };
+    const [sy, sm, sd] = startDate.split("-").map(Number);
+    const [ey, em, ed] = endDate.split("-").map(Number);
+    return {
+      start: istDayBounds(sy, sm - 1, sd).start,
+      end: istDayBounds(ey, em - 1, ed).end
+    };
   }
+  const { start: todayStart, end: todayEnd } = istTodayBounds();
   switch (period) {
     case "week": {
-      const start = new Date(now);
-      start.setDate(now.getDate() - 6);
-      start.setHours(0, 0, 0, 0);
-      return { start, end };
+      const weekStart = new Date(todayStart.getTime() - 6 * 24 * 60 * 60 * 1e3);
+      return { start: weekStart, end: todayEnd };
     }
     case "month": {
-      const start = new Date(now.getFullYear(), now.getMonth(), 1);
-      return { start, end };
+      const ist = toIST(/* @__PURE__ */ new Date());
+      return {
+        start: istDayBounds(ist.getUTCFullYear(), ist.getUTCMonth(), 1).start,
+        end: todayEnd
+      };
     }
-    default: {
-      const start = new Date(now);
-      start.setHours(0, 0, 0, 0);
-      return { start, end };
-    }
+    default:
+      return { start: todayStart, end: todayEnd };
   }
 }
-function getPreviousRange(period, start, end) {
+function getPreviousRange(start, end) {
   const diff = end.getTime() - start.getTime();
   const prevEnd = new Date(start.getTime() - 1);
   const prevStart = new Date(prevEnd.getTime() - diff);
@@ -94408,11 +94430,9 @@ router6.get("/reports/summary", async (req, res) => {
   const paramsParsed = GetReportSummaryQueryParams.safeParse(req.query);
   const params = paramsParsed.success ? paramsParsed.data : {};
   const { start, end } = getDateRange(params.period, params.startDate, params.endDate);
-  const { start: prevStart, end: prevEnd } = getPreviousRange(params.period, start, end);
-  const conditions = [gte(billsTable.createdAt, start), lte(billsTable.createdAt, end)];
-  const prevConditions = [gte(billsTable.createdAt, prevStart), lte(billsTable.createdAt, prevEnd)];
-  const bills = await db.select().from(billsTable).where(and(...conditions));
-  const prevBills = await db.select().from(billsTable).where(and(...prevConditions));
+  const { start: prevStart, end: prevEnd } = getPreviousRange(start, end);
+  const bills = await db.select().from(billsTable).where(and(gte(billsTable.createdAt, start), lte(billsTable.createdAt, end)));
+  const prevBills = await db.select().from(billsTable).where(and(gte(billsTable.createdAt, prevStart), lte(billsTable.createdAt, prevEnd)));
   const totalRevenue = bills.reduce((sum, b) => sum + parseFloat(b.total), 0);
   const totalOrders = bills.length;
   const averageBill = totalOrders > 0 ? totalRevenue / totalOrders : 0;
@@ -94424,8 +94444,7 @@ router6.get("/reports/summary", async (req, res) => {
   const ordersGrowth = prevOrders > 0 ? (totalOrders - prevOrders) / prevOrders * 100 : null;
   const itemCounts = {};
   bills.forEach((b) => {
-    const items = b.items;
-    items.forEach((item) => {
+    b.items.forEach((item) => {
       itemCounts[item.productName] = (itemCounts[item.productName] ?? 0) + item.quantity;
     });
   });
@@ -94449,10 +94468,14 @@ router6.get("/reports/top-products", async (req, res) => {
   const bills = await db.select().from(billsTable).where(and(gte(billsTable.createdAt, start), lte(billsTable.createdAt, end)));
   const productMap = {};
   bills.forEach((b) => {
-    const items = b.items;
-    items.forEach((item) => {
+    b.items.forEach((item) => {
       if (!productMap[item.productId]) {
-        productMap[item.productId] = { productId: item.productId, productName: item.productName, quantitySold: 0, revenue: 0 };
+        productMap[item.productId] = {
+          productId: item.productId,
+          productName: item.productName,
+          quantitySold: 0,
+          revenue: 0
+        };
       }
       productMap[item.productId].quantitySold += item.quantity;
       productMap[item.productId].revenue += item.totalPrice;
@@ -94490,7 +94513,7 @@ router6.get("/reports/peak-hours", async (req, res) => {
   const hourMap = {};
   for (let h = 0; h < 24; h++) hourMap[h] = { orders: 0, revenue: 0 };
   bills.forEach((b) => {
-    const hour = b.createdAt.getHours();
+    const hour = istHour(b.createdAt);
     hourMap[hour].orders++;
     hourMap[hour].revenue += parseFloat(b.total);
   });
@@ -94509,12 +94532,12 @@ router6.get("/reports/revenue-trend", async (req, res) => {
   const dayMap = {};
   const current = new Date(start);
   while (current <= end) {
-    const key = current.toISOString().slice(0, 10);
-    dayMap[key] = { revenue: 0, orders: 0 };
-    current.setDate(current.getDate() + 1);
+    const key = istDateKey(current);
+    if (!dayMap[key]) dayMap[key] = { revenue: 0, orders: 0 };
+    current.setUTCDate(current.getUTCDate() + 1);
   }
   bills.forEach((b) => {
-    const key = b.createdAt.toISOString().slice(0, 10);
+    const key = istDateKey(b.createdAt);
     if (dayMap[key]) {
       dayMap[key].revenue += parseFloat(b.total);
       dayMap[key].orders++;
