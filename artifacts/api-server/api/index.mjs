@@ -765,8 +765,8 @@ var require_depd = __commonJS({
       return deprecate;
     }
     function eehaslisteners(emitter, type) {
-      var count = typeof emitter.listenerCount !== "function" ? emitter.listeners(type).length : emitter.listenerCount(type);
-      return count > 0;
+      var count2 = typeof emitter.listenerCount !== "function" ? emitter.listeners(type).length : emitter.listenerCount(type);
+      return count2 > 0;
     }
     function isignored(namespace) {
       if (process.noDeprecation) {
@@ -18455,14 +18455,14 @@ var require_urlencoded = __commonJS({
       };
     }
     function parameterCount(body, limit) {
-      let count = 0;
+      let count2 = 0;
       let index = -1;
       do {
-        count++;
-        if (count > limit) return void 0;
+        count2++;
+        if (count2 > limit) return void 0;
         index = body.indexOf("&", index + 1);
       } while (index !== -1);
-      return count;
+      return count2;
     }
   }
 });
@@ -21763,13 +21763,13 @@ var require_mediaType = __commonJS({
       return spec.q > 0;
     }
     function quoteCount(string4) {
-      var count = 0;
+      var count2 = 0;
       var index = 0;
       while ((index = string4.indexOf('"', index)) !== -1) {
-        count++;
+        count2++;
         index++;
       }
-      return count;
+      return count2;
     }
     function splitKeyValuePair(str) {
       var index = str.indexOf("=");
@@ -23086,8 +23086,8 @@ var require_send = __commonJS({
       }
     }
     function hasListeners(emitter, type) {
-      var count = typeof emitter.listenerCount !== "function" ? emitter.listeners(type).length : emitter.listenerCount(type);
-      return count > 0;
+      var count2 = typeof emitter.listenerCount !== "function" ? emitter.listeners(type).length : emitter.listenerCount(type);
+      return count2 > 0;
     }
     function normalizeList(val, name) {
       var list = [].concat(val || []);
@@ -30843,11 +30843,11 @@ var require_binaryParsers = __commonJS({
         var array2 = [];
         var i2;
         if (dimension.length > 1) {
-          var count = dimension.shift();
-          for (i2 = 0; i2 < count; i2++) {
+          var count2 = dimension.shift();
+          for (i2 = 0; i2 < count2; i2++) {
             array2[i2] = parse3(dimension, elementType2);
           }
-          dimension.unshift(count);
+          dimension.unshift(count2);
         } else {
           for (i2 = 0; i2 < dimension[0]; i2++) {
             array2[i2] = parseElement(elementType2);
@@ -39752,8 +39752,12 @@ var init_relations = __esm({
 });
 
 // ../../node_modules/.pnpm/drizzle-orm@0.45.2_@types+pg@8.20.0_pg@8.22.0/node_modules/drizzle-orm/sql/functions/aggregate.js
+function count(expression) {
+  return sql`count(${expression || sql.raw("*")})`.mapWith(Number);
+}
 var init_aggregate = __esm({
   "../../node_modules/.pnpm/drizzle-orm@0.45.2_@types+pg@8.20.0_pg@8.22.0/node_modules/drizzle-orm/sql/functions/aggregate.js"() {
+    init_sql();
   }
 });
 
@@ -47349,8 +47353,8 @@ var init_az = __esm({
 });
 
 // ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/be.js
-function getBelarusianPlural(count, one, few, many) {
-  const absCount = Math.abs(count);
+function getBelarusianPlural(count2, one, few, many) {
+  const absCount = Math.abs(count2);
   const lastDigit = absCount % 10;
   const lastTwoDigits = absCount % 100;
   if (lastTwoDigits >= 11 && lastTwoDigits <= 19) {
@@ -50651,8 +50655,8 @@ var init_pt = __esm({
 });
 
 // ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/ru.js
-function getRussianPlural(count, one, few, many) {
-  const absCount = Math.abs(count);
+function getRussianPlural(count2, one, few, many) {
+  const absCount = Math.abs(count2);
   const lastDigit = absCount % 10;
   const lastTwoDigits = absCount % 100;
   if (lastTwoDigits >= 11 && lastTwoDigits <= 19) {
@@ -69916,13 +69920,13 @@ var require_stream_writable = __commonJS({
         var buffer = new Array(l);
         var holder = state.corkedRequestsFree;
         holder.entry = entry;
-        var count = 0;
+        var count2 = 0;
         var allBuffers = true;
         while (entry) {
-          buffer[count] = entry;
+          buffer[count2] = entry;
           if (!entry.isBuf) allBuffers = false;
           entry = entry.next;
-          count += 1;
+          count2 += 1;
         }
         buffer.allBuffers = allBuffers;
         doWrite(stream, state, true, state.length, buffer, "", holder.finish);
@@ -94246,11 +94250,33 @@ var import_express5 = __toESM(require_express2(), 1);
 init_src();
 init_drizzle_orm();
 var router5 = (0, import_express5.Router)();
-function generateBillNumber() {
+var IST_OFFSET_MS = (5 * 60 + 30) * 60 * 1e3;
+function istDayBounds(utcNow) {
+  const ist = new Date(utcNow.getTime() + IST_OFFSET_MS);
+  const y = ist.getUTCFullYear();
+  const m = ist.getUTCMonth();
+  const d = ist.getUTCDate();
+  const dateStr = `${y}${String(m + 1).padStart(2, "0")}${String(d).padStart(2, "0")}`;
+  return {
+    start: new Date(Date.UTC(y, m, d, 0, 0, 0, 0) - IST_OFFSET_MS),
+    end: new Date(Date.UTC(y, m, d, 23, 59, 59, 999) - IST_OFFSET_MS),
+    dateStr
+  };
+}
+async function generateBillNumber() {
   const now = /* @__PURE__ */ new Date();
-  const date6 = now.toISOString().slice(0, 10).replace(/-/g, "");
-  const random = Math.floor(Math.random() * 9e3) + 1e3;
-  return `BILL-${date6}-${random}`;
+  const { start, end, dateStr } = istDayBounds(now);
+  const rows = await db.select({ cnt: count() }).from(billsTable).where(and(gte(billsTable.createdAt, start), lte(billsTable.createdAt, end)));
+  const seq = (rows[0]?.cnt ?? 0) + 1;
+  return `BILL-${dateStr}-${String(seq).padStart(4, "0")}`;
+}
+function istDateStart(dateStr) {
+  const [y, m, d] = dateStr.split("-").map(Number);
+  return new Date(Date.UTC(y, m - 1, d, 0, 0, 0, 0) - IST_OFFSET_MS);
+}
+function istDateEnd(dateStr) {
+  const [y, m, d] = dateStr.split("-").map(Number);
+  return new Date(Date.UTC(y, m - 1, d, 23, 59, 59, 999) - IST_OFFSET_MS);
 }
 function formatBill(b) {
   return {
@@ -94281,12 +94307,10 @@ router5.get("/bills", async (req, res) => {
     conditions.push(eq(billsTable.paymentMethod, params.paymentMethod));
   }
   if (params.startDate) {
-    conditions.push(gte(billsTable.createdAt, new Date(params.startDate)));
+    conditions.push(gte(billsTable.createdAt, istDateStart(params.startDate)));
   }
   if (params.endDate) {
-    const end = new Date(params.endDate);
-    end.setHours(23, 59, 59, 999);
-    conditions.push(lte(billsTable.createdAt, end));
+    conditions.push(lte(billsTable.createdAt, istDateEnd(params.endDate)));
   }
   const limit = params.limit ?? 50;
   const offset = params.offset ?? 0;
@@ -94322,7 +94346,7 @@ router5.post("/bills", async (req, res) => {
     totalPrice: item.unitPrice * item.quantity
   }));
   const inserted = await db.insert(billsTable).values({
-    billNumber: generateBillNumber(),
+    billNumber: await generateBillNumber(),
     items: billItems,
     subtotal: String(subtotal.toFixed(2)),
     discount: String(discountAmount.toFixed(2)),
@@ -94370,9 +94394,9 @@ var import_express6 = __toESM(require_express2(), 1);
 init_src();
 init_drizzle_orm();
 var router6 = (0, import_express6.Router)();
-var IST_OFFSET_MS = (5 * 60 + 30) * 60 * 1e3;
+var IST_OFFSET_MS2 = (5 * 60 + 30) * 60 * 1e3;
 function toIST(utcDate) {
-  return new Date(utcDate.getTime() + IST_OFFSET_MS);
+  return new Date(utcDate.getTime() + IST_OFFSET_MS2);
 }
 function istDateKey(utcDate) {
   const d = toIST(utcDate);
@@ -94384,23 +94408,23 @@ function istDateKey(utcDate) {
 function istHour(utcDate) {
   return toIST(utcDate).getUTCHours();
 }
-function istDayBounds(y, m, d) {
+function istDayBounds2(y, m, d) {
   return {
-    start: new Date(Date.UTC(y, m, d, 0, 0, 0, 0) - IST_OFFSET_MS),
-    end: new Date(Date.UTC(y, m, d, 23, 59, 59, 999) - IST_OFFSET_MS)
+    start: new Date(Date.UTC(y, m, d, 0, 0, 0, 0) - IST_OFFSET_MS2),
+    end: new Date(Date.UTC(y, m, d, 23, 59, 59, 999) - IST_OFFSET_MS2)
   };
 }
 function istTodayBounds() {
   const ist = toIST(/* @__PURE__ */ new Date());
-  return istDayBounds(ist.getUTCFullYear(), ist.getUTCMonth(), ist.getUTCDate());
+  return istDayBounds2(ist.getUTCFullYear(), ist.getUTCMonth(), ist.getUTCDate());
 }
 function getDateRange(period, startDate, endDate) {
   if (startDate && endDate) {
     const [sy, sm, sd] = startDate.split("-").map(Number);
     const [ey, em, ed] = endDate.split("-").map(Number);
     return {
-      start: istDayBounds(sy, sm - 1, sd).start,
-      end: istDayBounds(ey, em - 1, ed).end
+      start: istDayBounds2(sy, sm - 1, sd).start,
+      end: istDayBounds2(ey, em - 1, ed).end
     };
   }
   const { start: todayStart, end: todayEnd } = istTodayBounds();
@@ -94412,7 +94436,7 @@ function getDateRange(period, startDate, endDate) {
     case "month": {
       const ist = toIST(/* @__PURE__ */ new Date());
       return {
-        start: istDayBounds(ist.getUTCFullYear(), ist.getUTCMonth(), 1).start,
+        start: istDayBounds2(ist.getUTCFullYear(), ist.getUTCMonth(), 1).start,
         end: todayEnd
       };
     }
@@ -94497,9 +94521,9 @@ router6.get("/reports/payment-methods", async (req, res) => {
     methodMap[method].amount += parseFloat(b.total);
   });
   const totalAmount = bills.reduce((sum, b) => sum + parseFloat(b.total), 0);
-  const stats = Object.entries(methodMap).map(([method, { count, amount }]) => ({
+  const stats = Object.entries(methodMap).map(([method, { count: count2, amount }]) => ({
     method,
-    count,
+    count: count2,
     amount: Math.round(amount * 100) / 100,
     percentage: totalAmount > 0 ? Math.round(amount / totalAmount * 1e3) / 10 : 0
   }));
@@ -94945,7 +94969,7 @@ ${cause.stack}`;
     var _this2 = this;
     let error40 = null;
     let data = null;
-    let count = null;
+    let count2 = null;
     let status = res.status;
     let statusText = res.statusText;
     if (res.ok) {
@@ -94971,7 +94995,7 @@ ${cause.stack}`;
       }
       const countHeader = (_this$headers$get2 = _this2.headers.get("Prefer")) === null || _this$headers$get2 === void 0 ? void 0 : _this$headers$get2.match(/count=(exact|planned|estimated)/);
       const contentRange = (_res$headers$get2 = res.headers.get("content-range")) === null || _res$headers$get2 === void 0 ? void 0 : _res$headers$get2.split("/");
-      if (countHeader && contentRange && contentRange.length > 1) count = parseInt(contentRange[1]);
+      if (countHeader && contentRange && contentRange.length > 1) count2 = parseInt(contentRange[1]);
       if (_this2.isMaybeSingle && Array.isArray(data)) if (data.length > 1) {
         error40 = {
           code: "PGRST116",
@@ -94980,7 +95004,7 @@ ${cause.stack}`;
           message: "JSON object requested, multiple (or no) rows returned"
         };
         data = null;
-        count = null;
+        count2 = null;
         status = 406;
         statusText = "Not Acceptable";
       } else if (data.length === 1) data = data[0];
@@ -95007,7 +95031,7 @@ ${cause.stack}`;
       success: error40 === null,
       error: error40,
       data,
-      count,
+      count: count2,
       status,
       statusText
     };
@@ -97334,7 +97358,7 @@ var PostgrestQueryBuilder = class {
   * ```
   */
   select(columns, options) {
-    const { head: head2 = false, count } = options !== null && options !== void 0 ? options : {};
+    const { head: head2 = false, count: count2 } = options !== null && options !== void 0 ? options : {};
     const method = head2 ? "HEAD" : "GET";
     let quoted = false;
     const cleanedColumns = (columns !== null && columns !== void 0 ? columns : "*").split("").map((c) => {
@@ -97344,7 +97368,7 @@ var PostgrestQueryBuilder = class {
     }).join("");
     const { url: url2, headers } = this.cloneRequestState();
     url2.searchParams.set("select", cleanedColumns);
-    if (count) headers.append("Prefer", `count=${count}`);
+    if (count2) headers.append("Prefer", `count=${count2}`);
     return new PostgrestFilterBuilder({
       method,
       url: url2,
@@ -97475,11 +97499,11 @@ var PostgrestQueryBuilder = class {
   * }
   * ```
   */
-  insert(values, { count, defaultToNull = true } = {}) {
+  insert(values, { count: count2, defaultToNull = true } = {}) {
     var _this$fetch;
     const method = "POST";
     const { url: url2, headers } = this.cloneRequestState();
-    if (count) headers.append("Prefer", `count=${count}`);
+    if (count2) headers.append("Prefer", `count=${count2}`);
     if (!defaultToNull) headers.append("Prefer", `missing=default`);
     if (Array.isArray(values)) {
       const columns = values.reduce((acc, x) => acc.concat(Object.keys(x)), []);
@@ -97716,13 +97740,13 @@ var PostgrestQueryBuilder = class {
   * }
   * ```
   */
-  upsert(values, { onConflict, ignoreDuplicates = false, count, defaultToNull = true } = {}) {
+  upsert(values, { onConflict, ignoreDuplicates = false, count: count2, defaultToNull = true } = {}) {
     var _this$fetch2;
     const method = "POST";
     const { url: url2, headers } = this.cloneRequestState();
     headers.append("Prefer", `resolution=${ignoreDuplicates ? "ignore" : "merge"}-duplicates`);
     if (onConflict !== void 0) url2.searchParams.set("on_conflict", onConflict);
-    if (count) headers.append("Prefer", `count=${count}`);
+    if (count2) headers.append("Prefer", `count=${count2}`);
     if (!defaultToNull) headers.append("Prefer", "missing=default");
     if (Array.isArray(values)) {
       const columns = values.reduce((acc, x) => acc.concat(Object.keys(x)), []);
@@ -97890,11 +97914,11 @@ var PostgrestQueryBuilder = class {
   * }
   * ```
   */
-  update(values, { count } = {}) {
+  update(values, { count: count2 } = {}) {
     var _this$fetch3;
     const method = "PATCH";
     const { url: url2, headers } = this.cloneRequestState();
-    if (count) headers.append("Prefer", `count=${count}`);
+    if (count2) headers.append("Prefer", `count=${count2}`);
     return new PostgrestFilterBuilder({
       method,
       url: url2,
@@ -98033,11 +98057,11 @@ var PostgrestQueryBuilder = class {
   * }
   * ```
   */
-  delete({ count } = {}) {
+  delete({ count: count2 } = {}) {
     var _this$fetch4;
     const method = "DELETE";
     const { url: url2, headers } = this.cloneRequestState();
-    if (count) headers.append("Prefer", `count=${count}`);
+    if (count2) headers.append("Prefer", `count=${count2}`);
     return new PostgrestFilterBuilder({
       method,
       url: url2,
@@ -98363,7 +98387,7 @@ var PostgrestClient = class PostgrestClient2 {
   * }
   * ```
   */
-  rpc(fn, args = {}, { head: head2 = false, get: get2 = false, count } = {}) {
+  rpc(fn, args = {}, { head: head2 = false, get: get2 = false, count: count2 } = {}) {
     var _this$fetch;
     let method;
     const url2 = new URL(`${this.url}/rpc/${fn}`);
@@ -98383,8 +98407,8 @@ var PostgrestClient = class PostgrestClient2 {
       body = args;
     }
     const headers = new Headers(this.headers);
-    if (_hasObjectArg) headers.set("Prefer", count ? `count=${count},return=minimal` : "return=minimal");
-    else if (count) headers.set("Prefer", `count=${count}`);
+    if (_hasObjectArg) headers.set("Prefer", count2 ? `count=${count2},return=minimal` : "return=minimal");
+    else if (count2) headers.set("Prefer", `count=${count2}`);
     return new PostgrestFilterBuilder({
       method,
       url: url2,

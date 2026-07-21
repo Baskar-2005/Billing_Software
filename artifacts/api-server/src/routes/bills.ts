@@ -1,6 +1,6 @@
 import { Router, type IRouter } from "express";
 import { db, billsTable } from "@workspace/db";
-import { eq, ilike, and, gte, lte, desc } from "drizzle-orm";
+import { eq, ilike, and, gte, lte, desc, count, like } from "drizzle-orm";
 import {
   CreateBillBody,
   GetBillParams,
@@ -10,11 +10,46 @@ import {
 
 const router: IRouter = Router();
 
-function generateBillNumber(): string {
+// IST helpers (UTC+5:30) — same approach used in reports.ts
+const IST_OFFSET_MS = (5 * 60 + 30) * 60 * 1000;
+
+function istDayBounds(utcNow: Date): { start: Date; end: Date; dateStr: string } {
+  const ist = new Date(utcNow.getTime() + IST_OFFSET_MS);
+  const y = ist.getUTCFullYear();
+  const m = ist.getUTCMonth();
+  const d = ist.getUTCDate();
+  const dateStr = `${y}${String(m + 1).padStart(2, "0")}${String(d).padStart(2, "0")}`;
+  return {
+    start: new Date(Date.UTC(y, m, d, 0, 0, 0, 0) - IST_OFFSET_MS),
+    end: new Date(Date.UTC(y, m, d, 23, 59, 59, 999) - IST_OFFSET_MS),
+    dateStr,
+  };
+}
+
+async function generateBillNumber(): Promise<string> {
   const now = new Date();
-  const date = now.toISOString().slice(0, 10).replace(/-/g, "");
-  const random = Math.floor(Math.random() * 9000) + 1000;
-  return `BILL-${date}-${random}`;
+  const { start, end, dateStr } = istDayBounds(now);
+
+  // Count bills already created on this IST calendar day
+  const rows = await db
+    .select({ cnt: count() })
+    .from(billsTable)
+    .where(and(gte(billsTable.createdAt, start), lte(billsTable.createdAt, end)));
+
+  const seq = (rows[0]?.cnt ?? 0) + 1;
+  return `BILL-${dateStr}-${String(seq).padStart(4, "0")}`;
+}
+
+/** Parse a YYYY-MM-DD string as IST midnight → UTC Date */
+function istDateStart(dateStr: string): Date {
+  const [y, m, d] = dateStr.split("-").map(Number);
+  return new Date(Date.UTC(y, m - 1, d, 0, 0, 0, 0) - IST_OFFSET_MS);
+}
+
+/** Parse a YYYY-MM-DD string as IST end-of-day → UTC Date */
+function istDateEnd(dateStr: string): Date {
+  const [y, m, d] = dateStr.split("-").map(Number);
+  return new Date(Date.UTC(y, m - 1, d, 23, 59, 59, 999) - IST_OFFSET_MS);
 }
 
 function formatBill(b: any) {
@@ -48,12 +83,10 @@ router.get("/bills", async (req, res): Promise<void> => {
     conditions.push(eq(billsTable.paymentMethod, params.paymentMethod));
   }
   if (params.startDate) {
-    conditions.push(gte(billsTable.createdAt, new Date(params.startDate)));
+    conditions.push(gte(billsTable.createdAt, istDateStart(params.startDate)));
   }
   if (params.endDate) {
-    const end = new Date(params.endDate);
-    end.setHours(23, 59, 59, 999);
-    conditions.push(lte(billsTable.createdAt, end));
+    conditions.push(lte(billsTable.createdAt, istDateEnd(params.endDate)));
   }
 
   const limit = params.limit ?? 50;
@@ -107,7 +140,7 @@ router.post("/bills", async (req, res): Promise<void> => {
   }));
 
   const inserted = await db.insert(billsTable).values({
-    billNumber: generateBillNumber(),
+    billNumber: await generateBillNumber(),
     items: billItems,
     subtotal: String(subtotal.toFixed(2)),
     discount: String(discountAmount.toFixed(2)),

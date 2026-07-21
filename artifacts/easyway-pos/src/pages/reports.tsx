@@ -235,27 +235,46 @@ export default function Reports() {
               <div className="h-[160px] w-full">
                 {loadingHours ? (
                   <div className="w-full h-full flex items-center justify-center"><Loader2 className="w-6 h-6 animate-spin text-muted-foreground" /></div>
-                ) : peakHours && peakHours.some(h => h.orders > 0) ? (
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={peakHours.filter(h => h.hour >= 6 && h.hour <= 22)} barSize={14}>
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
-                      <XAxis dataKey="hour" axisLine={false} tickLine={false}
-                        tickFormatter={(h) => h % 3 === 0 ? `${h}h` : ""}
-                        tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} />
-                      <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} width={25} />
-                      <RechartsTooltip
-                        contentStyle={{ borderRadius: '12px', border: '1px solid hsl(var(--border))', backgroundColor: 'hsl(var(--card))' }}
-                        formatter={(v: number) => [v, 'Orders']}
-                        labelFormatter={(h) => `${h}:00`}
-                      />
-                      <Bar dataKey="orders" radius={[4,4,0,0]}>
-                        {peakHours.filter(h => h.hour >= 6 && h.hour <= 22).map((entry, i) => (
-                          <Cell key={i} fill={entry.orders === Math.max(...peakHours.map(h=>h.orders)) ? "hsl(var(--primary))" : "hsl(var(--muted))"} />
-                        ))}
-                      </Bar>
-                    </BarChart>
-                  </ResponsiveContainer>
-                ) : (
+                ) : peakHours && peakHours.some(h => h.orders > 0) ? (() => {
+                  // Show all 24 hours — never filter out midnight (hour 0) orders
+                  const maxOrders = Math.max(...peakHours.map(h => h.orders));
+                  return (
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={peakHours} barSize={10}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
+                        <XAxis
+                          dataKey="hour"
+                          axisLine={false}
+                          tickLine={false}
+                          tickFormatter={(h) => h % 6 === 0 ? `${h}h` : ""}
+                          tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }}
+                        />
+                        <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} width={25} allowDecimals={false} />
+                        <RechartsTooltip
+                          contentStyle={{ borderRadius: '12px', border: '1px solid hsl(var(--border))', backgroundColor: 'hsl(var(--card))' }}
+                          formatter={(v: number) => [v, 'Orders']}
+                          labelFormatter={(h) => {
+                            const ampm = h < 12 ? 'AM' : 'PM';
+                            const display = h === 0 ? 12 : h > 12 ? h - 12 : h;
+                            return `${display}:00 ${ampm}`;
+                          }}
+                        />
+                        <Bar dataKey="orders" radius={[4, 4, 0, 0]}>
+                          {peakHours.map((entry, i) => (
+                            <Cell
+                              key={i}
+                              fill={entry.orders > 0 && entry.orders === maxOrders
+                                ? "hsl(var(--primary))"
+                                : entry.orders > 0
+                                  ? "hsl(var(--primary) / 0.4)"
+                                  : "hsl(var(--muted))"}
+                            />
+                          ))}
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
+                  );
+                })() : (
                   <div className="w-full h-full flex items-center justify-center text-muted-foreground text-sm">No data</div>
                 )}
               </div>
